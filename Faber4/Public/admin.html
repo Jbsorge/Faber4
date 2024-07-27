@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Text Comparison</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="text-columns">
+            <div class="column">
+                <h2>Original</h2>
+                <div id="originalText" class="text-content"></div>
+            </div>
+            <div class="column">
+                <h2>Ada Close Third</h2>
+                <div id="text2" class="text-content"></div>
+            </div>
+            <div class="column">
+                <h2>Melissa First Person</h2>
+                <div id="text1" class="text-content"></div>
+            </div>
+        </div>
+        <button id="saveButton">Save Changes</button>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        var editors = [
+            new Quill('#originalText', { theme: 'snow' }),
+            new Quill('#text2', { theme: 'snow' }),
+            new Quill('#text1', { theme: 'snow' })
+        ];
+
+        netlifyIdentity.on('init', user => {
+            if (!user) {
+                netlifyIdentity.open();
+            } else {
+                loadContent();
+            }
+        });
+
+        netlifyIdentity.on('login', user => {
+            console.log('Logged in:', user);
+            loadContent();
+        });
+
+        netlifyIdentity.on('logout', () => {
+            console.log('Logged out');
+            window.location.href = '/'; // Redirect to main page on logout
+        });
+
+        function loadContent() {
+            fetch('/.netlify/functions/api')
+                .then(response => response.json())
+                .then(content => {
+                    editors[0].setContents(content.original);
+                    editors[1].setContents(content.adaCloseThird);
+                    editors[2].setContents(content.melissaFirstPerson);
+                });
+        }
+
+        document.getElementById('saveButton').addEventListener('click', function() {
+            const content = {
+                original: editors[0].getContents(),
+                adaCloseThird: editors[1].getContents(),
+                melissaFirstPerson: editors[2].getContents()
+            };
+
+            fetch('/.netlify/functions/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(content)
+            })
+            .then(response => response.json())
+            .then(result => alert('Changes saved successfully!'));
+        });
+    </script>
+</body>
+</html>

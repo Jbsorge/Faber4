@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Comparison</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+    body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    overflow: hidden;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 10px;
+    padding-bottom: 10px; /* Add space at the bottom of the page */
+}
+.text-columns {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    max-height: calc(100vh - 280px); /* Reduce height to make room for comments and bottom space */
+}
+.column {
+    flex: 1;
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.text-content {
+    flex: 1;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+    transition: background-color 0.3s;
+    padding: 10px;
+}
+h2 {
+    text-align: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin: 0;
+    font-family: Helvetica, Arial, sans-serif;
+}
+.comments-section {
+    display: flex;
+    height: 240px; /* Slightly reduced height */
+    margin-top: 20px; /* Increased top margin for separation */
+}
+.comments {
+    flex: 1;
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+}
+.comments .text-content {
+    background-color: #e6f3ff;
+    flex: 1;
+    overflow-y: auto;
+}
+.ql-editor {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.ql-toolbar {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+.inactive {
+    background-color: #f0f0f0;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-columns">
+            <div class="column">
+                <h2>Original</h2>
+                <div id="originalText" class="text-content"></div>
+            </div>
+            <div class="column">
+                <h2>Ada Close Third</h2>
+                <div id="text2" class="text-content"></div>
+            </div>
+            <div class="column">
+                <h2>Melissa First Person</h2>
+                <div id="text1" class="text-content"></div>
+            </div>
+        </div>
+        <div class="comments-section">
+            <div class="comments">
+                <h2>Zoë's Comments</h2>
+                <div id="zoeComments" class="text-content"></div>
+            </div>
+            <div class="comments">
+                <h2>Catharina's Comments</h2>
+                <div id="catarinaComments" class="text-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        var readOnlyOptions = {
+            theme: 'snow',
+            modules: {
+                toolbar: false
+            },
+            readOnly: true
+        };
+
+        var editableOptions = {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'font': [] }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
+            }
+        };
+
+        var editors = [
+            new Quill('#originalText', readOnlyOptions),
+            new Quill('#text2', readOnlyOptions),
+            new Quill('#text1', readOnlyOptions),
+            new Quill('#zoeComments', editableOptions),
+            new Quill('#catarinaComments', editableOptions)
+        ];
+
+        function loadContent(editorIndex, content) {
+            editors[editorIndex].clipboard.dangerouslyPasteHTML(0, content);
+        }
+
+        // Load your content here
+        loadContent(0, `<p>Original content goes here...</p>`);
+        loadContent(1, `<p>Ada Close Third content goes here...</p>`);
+        loadContent(2, `<p>Melissa First Person content goes here...</p>`);
+        loadContent(3, `<p>Zoë can add comments here.</p>`);
+        loadContent(4, `<p>Catharina can add comments here.</p>`);
+
+        // Function to handle active/inactive states
+        function handleActiveState(event) {
+            const columns = document.querySelectorAll('.column .text-content');
+            columns.forEach(column => {
+                if (column.contains(event.target)) {
+                    column.classList.remove('inactive');
+                } else {
+                    column.classList.add('inactive');
+                }
+            });
+        }
+
+        // Add event listeners for mouse and focus events
+        document.addEventListener('mouseover', handleActiveState);
+        document.addEventListener('focus', handleActiveState, true);
+
+        // Initially set all columns as inactive except the first one
+        document.querySelectorAll('.column .text-content').forEach((column, index) => {
+            if (index !== 0) column.classList.add('inactive');
+        });
+    </script>
+</body>
+</html>

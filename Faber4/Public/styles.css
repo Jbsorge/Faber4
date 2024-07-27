@@ -1,0 +1,70 @@
+ body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    overflow: hidden;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 10px;
+    padding-bottom: 10px; /* Add space at the bottom of the page */
+}
+.text-columns {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    max-height: calc(100vh - 280px); /* Reduce height to make room for comments and bottom space */
+}
+.column {
+    flex: 1;
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.text-content {
+    flex: 1;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+    transition: background-color 0.3s;
+    padding: 10px;
+}
+h2 {
+    text-align: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin: 0;
+    font-family: Helvetica, Arial, sans-serif;
+}
+.comments-section {
+    display: flex;
+    height: 240px; /* Slightly reduced height */
+    margin-top: 20px; /* Increased top margin for separation */
+}
+.comments {
+    flex: 1;
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+}
+.comments .text-content {
+    background-color: #e6f3ff;
+    flex: 1;
+    overflow-y: auto;
+}
+.ql-editor {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.ql-toolbar {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+.inactive {
+    background-color: #f0f0f0;
+}
