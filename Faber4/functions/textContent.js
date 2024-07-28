@@ -1,32 +1,41 @@
+// functions/textContent.js and functions/comments.js
+
 const { MongoClient } = require('mongodb');
 
 const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+let cachedDb = null;
+
+async function connectToDatabase() {
+  if (cachedDb) {
+    return cachedDb;
+  }
+  await client.connect();
+  const db = client.db('faber4db'); // Replace with your actual database name
+  cachedDb = db;
+  return db;
+}
 
 exports.handler = async (event, context) => {
-  console.log("Function started");
+  context.callbackWaitsForEmptyEventLoop = false;
+  
   try {
-    console.log("Connecting to database");
-    await client.connect();
-    console.log("Connected to database");
-    const database = client.db('faber4db');
-    const collection = database.collection('your_collection_name');
-    
-    console.log("Fetching data from database");
-    const result = await collection.find({}).toArray();
-    console.log("Data fetched:", result);
+    const db = await connectToDatabase();
+    const collection = db.collection('your_collection_name'); // Replace with your actual collection name
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(result)
-    };
+    if (event.httpMethod === 'GET') {
+      const result = await collection.find({}).toArray();
+      return { statusCode: 200, body: JSON.stringify(result) };
+    } else if (event.httpMethod === 'POST') {
+      const data = JSON.parse(event.body);
+      await collection.insertOne(data);
+      return { statusCode: 200, body: JSON.stringify({ message: 'Data saved successfully' }) };
+    }
+
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   } catch (error) {
-    console.error("Error in function:", error);
-    return { 
-      statusCode: 500, 
-      body: JSON.stringify({ error: error.message, stack: error.stack }) 
-    };
-  } finally {
-    await client.close();
+    console.error('Database error:', error);
+    return { statusCode: 500, body: JSON.stringify({ error: 'Database operation failed' }) };
   }
 };
