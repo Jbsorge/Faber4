@@ -4,38 +4,28 @@ const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
 exports.handler = async (event, context) => {
+  console.log("Function started");
   try {
+    console.log("Connecting to database");
     await client.connect();
+    console.log("Connected to database");
     const database = client.db('faber4db');
-    const collection = database.collection('textContent');
+    const collection = database.collection('your_collection_name');
+    
+    console.log("Fetching data from database");
+    const result = await collection.find({}).toArray();
+    console.log("Data fetched:", result);
 
-    const { httpMethod, body } = event;
-
-    switch (httpMethod) {
-      case 'GET':
-        const content = await collection.find({}).toArray();
-        return { statusCode: 200, body: JSON.stringify(content) };
-
-      case 'POST':
-        const newContent = JSON.parse(body);
-        await collection.insertOne(newContent);
-        return { statusCode: 201, body: JSON.stringify({ message: 'Content created' }) };
-
-      case 'PUT':
-        const updatedContent = JSON.parse(body);
-        await collection.updateOne({ _id: updatedContent._id }, { $set: updatedContent });
-        return { statusCode: 200, body: JSON.stringify({ message: 'Content updated' }) };
-
-      case 'DELETE':
-        const { id } = JSON.parse(body);
-        await collection.deleteOne({ _id: id });
-        return { statusCode: 200, body: JSON.stringify({ message: 'Content deleted' }) };
-
-      default:
-        return { statusCode: 405, body: 'Method Not Allowed' };
-    }
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result)
+    };
   } catch (error) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'Failed to perform operation' }) };
+    console.error("Error in function:", error);
+    return { 
+      statusCode: 500, 
+      body: JSON.stringify({ error: error.message, stack: error.stack }) 
+    };
   } finally {
     await client.close();
   }

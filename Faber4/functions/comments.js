@@ -4,39 +4,29 @@ const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
 exports.handler = async (event, context) => {
-  try {
-    await client.connect();
-    const database = client.db('faber4db');
-    const collection = database.collection('comments');
-
-    const { httpMethod, body } = event;
-
-    switch (httpMethod) {
-      case 'GET':
-        const comments = await collection.find({}).toArray();
-        return { statusCode: 200, body: JSON.stringify(comments) };
-
-      case 'POST':
-        const newComment = JSON.parse(body);
-        await collection.insertOne(newComment);
-        return { statusCode: 201, body: JSON.stringify({ message: 'Comment created' }) };
-
-      case 'PUT':
-        const updatedComment = JSON.parse(body);
-        await collection.updateOne({ _id: updatedComment._id }, { $set: updatedComment });
-        return { statusCode: 200, body: JSON.stringify({ message: 'Comment updated' }) };
-
-      case 'DELETE':
-        const { id } = JSON.parse(body);
-        await collection.deleteOne({ _id: id });
-        return { statusCode: 200, body: JSON.stringify({ message: 'Comment deleted' }) };
-
-      default:
-        return { statusCode: 405, body: 'Method Not Allowed' };
+    console.log("Function started");
+    try {
+      console.log("Connecting to database");
+      await client.connect();
+      console.log("Connected to database");
+      const database = client.db('faber4db');
+      const collection = database.collection('your_collection_name');
+      
+      console.log("Fetching data from database");
+      const result = await collection.find({}).toArray();
+      console.log("Data fetched:", result);
+  
+      return {
+        statusCode: 200,
+        body: JSON.stringify(result)
+      };
+    } catch (error) {
+      console.error("Error in function:", error);
+      return { 
+        statusCode: 500, 
+        body: JSON.stringify({ error: error.message, stack: error.stack }) 
+      };
+    } finally {
+      await client.close();
     }
-  } catch (error) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'Failed to perform operation' }) };
-  } finally {
-    await client.close();
-  }
-};
+  };
