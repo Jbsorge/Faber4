@@ -114,53 +114,45 @@
     </div>
 
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script>
-        var readOnlyOptions = {
-            theme: 'snow',
-            modules: {
-                toolbar: false
-            },
-            readOnly: true
-        };
-
-        var editableOptions = {
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline'],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'font': [] }],
-                    [{ 'align': [] }],
-                    ['clean']
-                ]
-            }
-        };
-
-        var editors = [
-            new Quill('#originalText', readOnlyOptions),
-            new Quill('#text2', readOnlyOptions),
-            new Quill('#text1', readOnlyOptions),
-            new Quill('#zoeComments', editableOptions),
-            new Quill('#catarinaComments', editableOptions)
-        ];
-
-        function handleActiveState(event) {
-            const columns = document.querySelectorAll('.column .text-content');
-            columns.forEach(column => {
-                if (column.contains(event.target)) {
-                    column.classList.remove('inactive');
-                } else {
-                    column.classList.add('inactive');
-                }
-            });
+<script>
+    var editableOptions = {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+                ['clean']
+            ]
         }
+    };
 
-        document.addEventListener('mouseover', handleActiveState);
-        document.addEventListener('focus', handleActiveState, true);
+    var editors = [
+        new Quill('#originalText', editableOptions),
+        new Quill('#text2', editableOptions),
+        new Quill('#text1', editableOptions),
+        new Quill('#zoeComments', editableOptions),
+        new Quill('#catarinaComments', editableOptions)
+    ];
 
-        document.querySelectorAll('.column .text-content').forEach((column, index) => {
-            if (index !== 0) column.classList.add('inactive');
+    function handleActiveState(event) {
+        const columns = document.querySelectorAll('.column .text-content');
+        columns.forEach(column => {
+            if (column.contains(event.target)) {
+                column.classList.remove('inactive');
+            } else {
+                column.classList.add('inactive');
+            }
         });
-    </script>
+    }
+
+    document.addEventListener('mouseover', handleActiveState);
+    document.addEventListener('focus', handleActiveState, true);
+
+    document.querySelectorAll('.column .text-content').forEach((column, index) => {
+        if (index !== 0) column.classList.add('inactive');
+    });
+</script>
 </body>
 </html>
